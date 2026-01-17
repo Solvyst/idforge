@@ -1,0 +1,49 @@
+{
+  "name": "idforge",
+  "version": "0.1.0",
+  "description": "DB-safe public IDs & slugs for MongoDB and SQL",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "id",
+    "slug",
+    "public-id",
+    "unique",
+    "nanoid",
+    "mongodb",
+    "postgres",
+    "sql",
+    "prisma",
+    "mongoose",
+    "kysely",
+    "drizzle"
+  ],
+  "author": "Solvyst",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.0",
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  },
+  "dependencies": {
+    "nanoid": "^5.1.6"
+  }
+}
