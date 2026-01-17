@@ -92,7 +92,46 @@ const slug = await genUniqueSlug({
   }
 });
 
-// john-doe or john-doe-2
+// Result: "john-doe" or "john-doe-2"
+```
+
+---
+
+## What is `exists(value)`?
+
+`exists` is a **user-provided function** that tells idforge
+whether a value already exists **in your database**.
+
+It must return:
+
+* `true` -> value is already taken
+* `false` -> value is available
+
+> idforge does **not** know about your database.
+> You decide how uniqueness is checked.
+
+### Examples
+
+#### MongoDB (Mongoose)
+
+```ts
+exists: async (slug) => {
+  return !!(await UserModel.exists({ slug }));
+}
+```
+
+#### SQL / PostgreSQL
+
+```ts
+exists: async (slug) => {
+  const row = await db
+    .selectFrom("users")
+    .select("id")
+    .where("slug", "=", slug)
+    .executeTakeFirst();
+
+  return !!row;
+}
 ```
 
 ---
@@ -142,7 +181,8 @@ import {
 const result = await createWithUniqueValue({
   generate: genProviderId,
   insert: async (publicId) => {
-    return await db.insertInto("providers")
+    return await db
+      .insertInto("providers")
       .values({ public_id: publicId, name: "John" })
       .returningAll()
       .executeTakeFirstOrThrow();
@@ -151,7 +191,7 @@ const result = await createWithUniqueValue({
 });
 ```
 
-This is:
+This approach is:
 
 * ✅ concurrency safe
 * ✅ database enforced
@@ -194,7 +234,7 @@ const user = await createWithUniqueValue({
 
 ## Database Requirements
 
-You **must** define a unique index:
+You **must** define a unique index.
 
 ### PostgreSQL
 
@@ -218,7 +258,7 @@ Creates a reusable ID generator.
 
 ### `slugify(input, options)`
 
-Converts text to URL-safe slug.
+Converts text to a URL-safe slug.
 
 ### `genUniqueValue({ generate, exists })`
 
@@ -230,11 +270,11 @@ Slugifies and resolves collisions.
 
 ### `createWithUniqueValue({ generate, insert, isDuplicateError })`
 
-**Race-safe** creation strategy.
+**Race-safe** creation strategy using DB constraints.
 
 ### `isMongoDuplicate(error)`
 
-Detects Mongo duplicate key errors.
+Detects MongoDB duplicate key errors.
 
 ### `isPostgresDuplicate(error)`
 
@@ -257,7 +297,7 @@ Detects PostgreSQL unique constraint violations.
 
 * If you don't need public IDs
 * If collisions don't matter
-* If you already rely on DB auto IDs only
+* If you rely entirely on DB auto-generated IDs
 
 ---
 
